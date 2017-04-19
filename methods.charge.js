@@ -6,11 +6,11 @@
  * var mod = require('methods.charge');
  * mod.thing == 'a thing'; // true
  */
+    
+// this array of destinations must be in the order from first-to-last priority
+var chargeDestinations = [FIND_MY_SPAWNS]
  
 var chargeMethods = {
-    
-    // this array of destinations must be in the order from first-to-last priority
-    chargeDestinations : [FIND_MY_SPAWNS]
     
     // directs parameter "creep" to charge the first "chargeDestinations" element that isn't already full
     // returns true if the creep successfully harvests or moves toward a resource that is not fully charged
@@ -20,13 +20,25 @@ var chargeMethods = {
                 return (structure.carry < structure.carryCapacity);
             };
         var chargeables = creep.room.find(chargeDestinations, chargeablesFilter);
-        if (chargeables[0]) {
-            if (creep.harvest(chargeables[0]) == ERROR_NOT_IN_RANGE) {
+        if (chargeables[0] && chargeables[0].energy < chargeables[0].energyCapacity) {
+            if (creep.harvest(chargeables[0]) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(chargeables[0]);
-            } 
+            }
             return true;
         }
         return false;
+    },
+    
+    upgradeController : function(creep) {
+        var controller = creep.room.controller;
+        if (controller) {
+            if (creep.upgradeController(controller) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(controller);
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
     
 }

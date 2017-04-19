@@ -6,17 +6,34 @@
  * var mod = require('role.harvester');
  * mod.thing == 'a thing'; // true
  */
+ 
+var chargeMethods = require('methods.charge');
 
 var roleHarvester = {
     
+    create : function(spawn) {
+        var creep = spawn.createCreep();
+        creep.memory.role = 'harvester';
+        creep.memory.depositing = false;
+    },
+    
     run : function(creep) {
-        if (creep.carry < creep.carryCapacity) {
+        
+        if (!creep.memory.depositing && creep.carry.energy < creep.carryCapacity) {
             var srcs = creep.room.find(FIND_SOURCES);
             if (creep.harvest(srcs[0]) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(nearestSrc);
+                creep.moveTo(srcs[0]);
+            } else if (creep.carry.energy == creep.carryCapacity) {
+                creep.memory.depositing = true;
+                creep.say("depositing");
             }
         } else {
-            // have it run chargeMethods.stdCharge
+            if (creep.carry.energy == 0) {
+                creep.say("gathering");
+                creep.memory.depositing = false;
+            } else if (!chargeMethods.stdCharge(creep)) {
+                chargeMethods.upgradeController(creep);
+            }
         }
         
     }
