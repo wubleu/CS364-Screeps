@@ -19,11 +19,14 @@ var roleHarvester = {
     
     run : function(creep) {
         
-        if (!creep.memory.depositing && creep.carry.energy < creep.carryCapacity) {
-            var srcs = creep.room.find(FIND_SOURCES);
-            if (creep.harvest(srcs[0]) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(srcs[0]);
-            } else if (creep.carry.energy == creep.carryCapacity) {
+        if (!creep.memory.depositing) {
+            if (creep.carry.energy < creep.carryCapacity) {
+                var srcs = creep.room.find(FIND_SOURCES);
+                if (creep.harvest(srcs[0]) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(srcs[0]);
+                } 
+            }
+            else {
                 creep.memory.depositing = true;
                 creep.say("depositing");
             }
