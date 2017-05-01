@@ -12,9 +12,8 @@ var chargeMethods = require('methods.charge');
 var roleHarvester = {
     
     create : function(spawn) {
-        var creep = spawn.createCreep();
-        creep.memory.role = 'harvester';
-        creep.memory.depositing = false;
+        var creep = spawn.createCreep([WORK, CARRY, MOVE], { role : 'harvester', new : true});
+        return creep;
     },
     
     run : function(creep) {

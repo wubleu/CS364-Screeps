@@ -19,7 +19,8 @@ var chargeMethods = {
             function(structure) {
                 return (structure.energy < structure.energyCapacity);
             };
-        var chargeables = creep.room.find(chargeDestinations, chargeablesFilter);
+        var chargeables = creep.pos.findClosestByPath(chargeDestinations, chargeablesFilter);
+        console.log("here");
         console.log(chargeables[0] && chargeables[0].energy < chargeables[0].energyCapacity);
         if (chargeables[0] && chargeables[0].energy < chargeables[0].energyCapacity) {
             if (creep.transfer(chargeables[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
