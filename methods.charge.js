@@ -17,11 +17,12 @@ var chargeMethods = {
     stdCharge : function(creep) {
         var chargeablesFilter = 
             function(structure) {
-                return (structure.carry < structure.carryCapacity);
+                return (structure.energy < structure.energyCapacity);
             };
         var chargeables = creep.room.find(chargeDestinations, chargeablesFilter);
+        console.log(chargeables[0] && chargeables[0].energy < chargeables[0].energyCapacity);
         if (chargeables[0] && chargeables[0].energy < chargeables[0].energyCapacity) {
-            if (creep.harvest(chargeables[0]) == ERR_NOT_IN_RANGE) {
+            if (creep.transfer(chargeables[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(chargeables[0]);
             }
             return true;
