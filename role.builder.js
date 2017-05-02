@@ -1,4 +1,10 @@
+var chargeMethods = require("methods.charge");
+
 var roleBuilder = {
+
+    create: function(spawn) {
+        var creep = spawn.createCreep([WORK, WORK, CARRY, MOVE], {role : 'builder', new : true});
+    },
 
     /** @param {Creep} creep **/
     run: function(creep) {
@@ -17,9 +23,13 @@ var roleBuilder = {
         //building structures
         if(creep.memory.building) {
             var targets = creep.room.find(FIND_CONSTRUCTION_SITES);
-            if(targets.length) {
-                if(creep.build(targets[0]) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(targets[0], {visualizePathStyle: {stroke: '#ffffff'}});
+            if (!chargeMethods.repair(creep)) {
+                if (targets.length != 0) {
+                    if(creep.build(targets[1]) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(targets[1], {visualizePathStyle: {stroke: '#ffffff'}});
+                    }
+                } else {
+                    chargeMethods.stdCharge(creep) || chargeMethods.upgradeController(creep);
                 }
             }
         }

@@ -6,9 +6,6 @@
  * var mod = require('methods.charge');
  * mod.thing == 'a thing'; // true
  */
-    
-// this array of destinations must be in the order from first-to-last priority
-var chargeDestinations = [FIND_MY_SPAWNS]
  
 var chargeMethods = {
     
@@ -17,17 +14,31 @@ var chargeMethods = {
     stdCharge : function(creep) {
         var chargeablesFilter = 
             function(structure) {
-                return (structure.energy < structure.energyCapacity);
+                var type = structure.structureType;
+                return structure.energy < structure.energyCapacity && 
+                       (type == STRUCTURE_EXTENSION || type == STRUCTURE_SPAWN);
             };
-        var chargeables = creep.room.find(chargeDestinations, chargeablesFilter);
-        console.log(chargeables[0] && chargeables[0].energy < chargeables[0].energyCapacity);
-        if (chargeables[0] && chargeables[0].energy < chargeables[0].energyCapacity) {
+        var chargeables = creep.room.find(FIND_MY_STRUCTURES, {filter : chargeablesFilter});
+        if (chargeables[0]) {
             if (creep.transfer(chargeables[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(chargeables[0]);
             }
             return true;
         }
         return false;
+    },
+    
+    repair : function(creep) {
+        var repairableFilter = (s) => (s.hits < s.hitsMax);
+        var repairables = Game.spawns.Spawn1.room.find(FIND_MY_STRUCTURES, {filter : repairableFilter});
+        if (!repairables[0]) {
+            return false;
+        }
+        if (creep.repair(repairables[0]) == ERR_NOT_IN_RANGE) {
+            console.log(repairables[0]);
+            creep.moveByPath(repairables[0]);
+        }
+        return true;
     },
     
     upgradeController : function(creep) {

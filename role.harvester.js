@@ -12,18 +12,21 @@ var chargeMethods = require('methods.charge');
 var roleHarvester = {
     
     create : function(spawn) {
-        var creep = spawn.createCreep();
-        creep.memory.role = 'harvester';
-        creep.memory.depositing = false;
+        var srcs = spawn.room.find(FIND_SOURCES);
+        if (Memory.harvestInd == 0) {
+            Memory.harvestInd = 1;
+        } else {
+            Memory.harvestInd = 0;
+        }
+        var creep = spawn.createCreep([WORK, CARRY, MOVE], {role : 'harvester', new : true, node : srcs[1].id});
     },
     
     run : function(creep) {
         
         if (!creep.memory.depositing) {
             if (creep.carry.energy < creep.carryCapacity) {
-                var srcs = creep.room.find(FIND_SOURCES);
-                if (creep.harvest(srcs[0]) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(srcs[0]);
+                if (creep.harvest(Game.getObjectById(creep.memory.node)) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(Game.getObjectById(creep.memory.node));
                 } 
             }
             else {
