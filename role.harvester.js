@@ -18,7 +18,7 @@ var roleHarvester = {
         } else {
             Memory.harvestInd = 0;
         }
-        var creep = spawn.createCreep([WORK, CARRY, MOVE], {role : 'harvester', new : true, node : srcs[1].id});
+        var creep = spawn.createCreep([WORK, CARRY, MOVE], {role : 'harvester', new : true, node : srcs[Memory.harvestInd].id});
     },
     
     run : function(creep) {

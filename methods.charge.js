@@ -35,7 +35,6 @@ var chargeMethods = {
             return false;
         }
         if (creep.repair(repairables[0]) == ERR_NOT_IN_RANGE) {
-            console.log(repairables[0]);
             creep.moveByPath(repairables[0]);
         }
         return true;
