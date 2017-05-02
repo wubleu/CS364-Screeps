@@ -8,17 +8,12 @@
  */
  
 var chargeMethods = require('methods.charge');
-
+ 
 var roleHarvester = {
     
     create : function(spawn) {
         var srcs = spawn.room.find(FIND_SOURCES);
-        if (Memory.harvestInd == 0) {
-            Memory.harvestInd = 1;
-        } else {
-            Memory.harvestInd = 0;
-        }
-        var creep = spawn.createCreep([WORK, CARRY, MOVE], {role : 'harvester', new : true, node : srcs[Memory.harvestInd].id});
+        var creep = spawn.createCreep([WORK, CARRY, MOVE], {role : 'harvester', new : true, node : srcs[0].id});
     },
     
     run : function(creep) {
