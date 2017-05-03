@@ -15,10 +15,13 @@ module.exports.loop = function() {
             numBuilders++;
         }
     }
-    if (numHarvesters < 6) {
+    if (numHarvesters < 4) {
         roleHarvester.create(Game.spawns.Spawn1);
     }
-    if (numBuilders < 4) {
+    if (numBuilders < 3) {
+        roleBuilder.create(Game.spawns.Spawn1);
+    }
+    if (numBuilders + numHarvesters == 0) {
         roleBuilder.create(Game.spawns.Spawn1);
     }
     

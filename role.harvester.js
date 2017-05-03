@@ -13,7 +13,9 @@ var roleHarvester = {
     
     create : function(spawn) {
         var srcs = spawn.room.find(FIND_SOURCES);
-        var creep = spawn.createCreep([WORK, CARRY, MOVE], {role : 'harvester', new : true, node : srcs[0].id});
+        var creep = spawn.createCreep(
+            [WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], 
+            {role : 'harvester', new : true, node : '9263077296e02bb'});
     },
     
     run : function(creep) {
