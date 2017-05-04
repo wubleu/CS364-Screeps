@@ -13,6 +13,7 @@ var startQ = 1;
 var actions = ["wc","wm","cw","cm","mw","mc",0,-1];
 
 Memory.QTab = {};
+
 var QTable = {
     
     
@@ -24,20 +25,39 @@ var QTable = {
                 for(m=0;m<=parts;m++){
                     if(w+c+m == parts){
                         var index = w.toString() + "w" + c.toString() + "c" + m.toString() + "m";
-                        if (index == baseCreep){
-                            Memory.QTab.harvester[index] = 20;   
-                        }else{
-                            Memory.QTab.harvester[index] = startQ;
-                        }
+                        Memory.QTab.harvester[index] = startQ;
                     }
                 }
             }
         }
     },
     
-    update : function(){
+    update : function(state, collected){
         // Updates the reward after the life of the creep. 
-                return true;
+        //Takes creep data from 5 ticks left suicide() call, and updates that entry of the table.
+        var totalCost = 0;
+        
+        var w = parseInt(state.charAt(0));
+        var c = parseInt(state.charAt(2));
+        var m = parseInt(state.charAt(4));
+        
+        var i;
+        for (i=0;i<w;i++){
+            totalCost += 100;
+        }
+        for (i=0;i<c;i++){
+            totalCost += 50;
+        }
+        for (i=0;i<m;i++){
+            totalCost += 50;
+        }
+        
+        
+        var value = collected - totalCost;
+        
+        Memory.QTab.harvester[state] = value;
+        
+        return true;
 
     },
     
@@ -45,9 +65,9 @@ var QTable = {
         // Take the current state, and record the proper action.
         // return the new state
         if (action == 0){
-            return Memory.QTab.harvester[state];
+            return state;
         } if (action == -1){
-            return Memory.QTab.harvester[baseState];
+            return baseCreep;
         }
         var w = parseInt(state.charAt(0));
         var c = parseInt(state.charAt(2));
@@ -85,7 +105,7 @@ var QTable = {
     },
     
     startState : function(){
-        return baseState;
+        return baseCreep;
     },
     
     getReward : function(state, action){
@@ -93,8 +113,11 @@ var QTable = {
         if (action == 0){
             return Memory.QTab.harvester[state];
         } if (action == -1){
-            return Memory.QTab.harvester[baseState];
+            return Memory.QTab.harvester[baseCreep];
         }
+        
+        //console.log(state);
+        
         var w = parseInt(state.charAt(0));
         var c = parseInt(state.charAt(2));
         var m = parseInt(state.charAt(4));
@@ -128,9 +151,42 @@ var QTable = {
         return Memory.QTab.harvester[newState];
     },
     
-    softmax : function(){
+    softmax : function(state){
         // use Softmax equation to choose the next action
-                return true;
+        
+        var probs = [];
+        var t = .99;
+        
+        
+        //total
+        var i;
+        var rewardSum = 0;
+        for (i=0; i<actions.length;i++){
+            rewardSum = rewardSum + QTable.getReward(state, actions[i]);
+        }
+        var total = Math.exp(rewardSum/t);
+        
+        //individuals 
+        var k;
+        for (k=0; k<actions.length;k++){
+            var ind = Math.exp(QTable.getReward(state, actions[k]));
+            var prob = ind/total;
+            probs.push(prob);
+        }  
+        
+        //Choose based on probabilities.
+        var r = Math.random();
+        var upto = 0;
+        var p;
+        for (p=0; p<probs.length;p++){
+            upto += probs[p];
+            if (upto >= r){
+                return actions[p];
+            }
+        }
+        
+        //retun false on error, shouldn't ever get here.
+        return false;
 
     }
     
