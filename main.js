@@ -35,15 +35,16 @@ module.exports.loop = function() {
     
     let room1HarvesterMin = 3;
     let room1BuilderMin = 2;
-    let room2HarvesterMin = 2;
-    let room2BuilderMin = 3;
+    let room2HarvesterMin = 3;
+    let room2BuilderMin = 2;
     
     
     
     var numHarvestersR1 = 0;
     var numBuildersR1 = 0;
-    var numHarvestersR2 = 0;
-    var numBuildersR2 = 0;
+    var numHarvestersR2 = Memory.migrating;
+    var numBuildersR2 = Memory.migrating;
+    var numCreepsR2 = 0;
     for (var name in Game.creeps) {
         var creep = Game.creeps[name];
         if (creep.room == room1) {
@@ -54,6 +55,7 @@ module.exports.loop = function() {
                 roleBuilder.run(creep);
                 numBuildersR1++;
             }
+            numCreepsR2++;
         }
         if (creep.room == room2) {
             if (creep.memory.role == 'harvester') {
@@ -88,6 +90,10 @@ module.exports.loop = function() {
     if (numBuildersR2 + numHarvestersR2 == 0) {
         roleBuilder.create(Game.spawns.Spawn2, [WORK, CARRY, MOVE]);
     }
+    if (numBuildersR2+numHarvestersR2 == numCreepsR2) {
+        Memory.migrating = 0;
+    }
+    console.log(Memory.migrating);
     
     if (room1.find(FIND_HOSTILE_CREEPS)[0]) {
         structureDefense.towersDefend(room1);

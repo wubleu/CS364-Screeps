@@ -5,7 +5,8 @@ var roleBuilder = {
     create: function(spawn, config) {
         var migrating = 0;
         if (arguments.length > 2) {
-            migrating = arguments[2];
+            creep.memory.migrating = arguments[2];
+            Memory.migrating++;
         }
         spawn.createCreep(config, {role : 'builder', building : false, migrating : migrating});
     },
@@ -15,7 +16,11 @@ var roleBuilder = {
         if (creep.memory.migrating == 2) {
             var p = new RoomPosition(25, 45, 'W7N4');
             creep.moveTo(p);
-            if (creep.pos.isEqualTo(p)) { creep.memory.migrating = 0; }
+            if (creep.pos.isEqualTo(p)) { 
+                creep.memory.migrating = 0;
+                Memory.migrating--; 
+                creep.memory.node = creep.pos.findClosestByPath(FIND_SOURCES, {filter : (s) => (s.energy > 0)}).id;
+            }
             else { return; }
         }
         
@@ -23,7 +28,7 @@ var roleBuilder = {
         if(creep.memory.building && creep.carry.energy == 0) {
             creep.memory.building = false;
             creep.say('harvest'); 
-            var node = creep.pos.findClosestByPath(FIND_SOURCES, {filter : (s) => (s.energy > 0 && s.room.id == creep.room.id)});
+            var node = creep.pos.findClosestByPath(FIND_SOURCES, {filter : (s) => (s.energy > 0)});
             if (node) {
                 creep.memory.node = node.id;
             }

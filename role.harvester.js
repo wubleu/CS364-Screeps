@@ -5,30 +5,36 @@ var roleHarvester = {
     create : function(spawn, config) {
         var migrating = 0;
         if (arguments.length > 2) {
-            migrating = arguments[2];
+            creep.memory.migrating = arguments[2];
+            Memory.migrating++;
         }
-        spawn.createCreep(config, {role : 'builder', building : false, migrating : migrating});
+        spawn.createCreep(config, {role : 'harvester', building : false, migrating : migrating});
     },
     
     run : function(creep) {
         if (creep.memory.migrating == 2) {
             var p = new RoomPosition(25, 45, 'W7N4');
             creep.moveTo(p);
-            if (creep.pos.isEqualTo(p)) { creep.memory.migrating = 0; }
+            if (creep.pos.isEqualTo(p)) { 
+                creep.memory.migrating = 0; 
+                Memory.migrating--;
+                creep.memory.node = creep.pos.findClosestByPath(FIND_SOURCES, {filter : (s) => (s.energy > 0)}).id;
+            }
             else { return; }
         }
         
         if (!creep.memory.depositing) {
             if (creep.carry.energy < creep.carryCapacity) {
-                if (Game.getObjectById(creep.memory.node).energy == 0) {
+                var node = Game.getObjectById(creep.memory.node);
+                if (node && node.energy == 0) {
                     var node = creep.pos.findClosestByPath(FIND_SOURCES, {filter : (s) => (s.energy > 0)});
                     if (node) {
                         creep.memory.node = node.id;
                     }
                 }  
-                if (creep.harvest(Game.getObjectById(creep.memory.node)) == ERR_NOT_IN_RANGE) {
-                    if (creep.moveTo(Game.getObjectById(creep.memory.node)) == ERR_NO_PATH) {
-                        var node = creep.pos.findClosestByPath(FIND_SOURCES, {filter : (s) => (s.energy > 0)});
+                if (node && creep.harvest(node) == ERR_NOT_IN_RANGE) {
+                    if (creep.moveTo(node) == ERR_NO_PATH) {
+                        node = creep.pos.findClosestByPath(FIND_SOURCES, {filter : (s) => (s.energy > 0)});
                         if (node) {
                             creep.memory.node = node.id;
                         }
