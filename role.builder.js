@@ -4,20 +4,27 @@ var roleBuilder = {
 
     create: function(spawn) {
         spawn.createCreep(
-            [WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], 
-            {role : 'builder', new : true, node : 'c12d077296e6ac9'});
+            [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, 
+             CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], 
+            {role : 'builder', node : 'c12d077296e6ac9', building : false});
     },
 
     /** @param {Creep} creep **/
     run: function(creep) {
-
+        if (Memory.repairCounter > 40000) {
+             if (chargeMethods.repairWallsRamparts(creep, 15000)) {
+                 return;
+             } else {
+                 Memory.repairCounter = 0;
+             }
+        }
         //switch to not building if no energy to build with
         if(creep.memory.building && creep.carry.energy == 0) {
             creep.memory.building = false;
             creep.say('harvest');
         }
         //switch to building if full on energy
-        if(!creep.memory.building && creep.carry.energy == creep.carryCapacity) {
+        else if(!creep.memory.building && creep.carry.energy == creep.carryCapacity) {
             creep.memory.building = true;
             creep.say('build');
         }
@@ -38,8 +45,8 @@ var roleBuilder = {
         //harvesting
         else {
             var Container = creep.pos.findClosestByPath(FIND_STRUCTURES, { //get the container
-                    filter: (s) => s.structureType == STRUCTURE_CONTAINER
-                                && s.store[RESOURCE_ENERGY] > 0
+                    filter: (s) => (s.structureType == STRUCTURE_CONTAINER &&
+                                    s.store[RESOURCE_ENERGY] > 0)
             })
             if (Container){
                 if (creep.withdraw(Container, RESOURCE_ENERGY)==ERR_NOT_IN_RANGE){
@@ -47,8 +54,8 @@ var roleBuilder = {
                 }
             }else{
                 if (creep.memory.node) {
-                    if (creep.harvest(creep.memory.node) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(creep.memory.node);
+                    if (creep.harvest(Game.getObjectById(creep.memory.node)) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(Game.getObjectById(creep.memory.node));
                     }
                     return true;
                 }

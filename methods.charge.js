@@ -7,6 +7,7 @@
  * mod.thing == 'a thing'; // true
  */
  
+ 
 var chargeMethods = {
     
     // directs parameter "creep" to charge the first "chargeDestinations" element that isn't already full
@@ -16,12 +17,12 @@ var chargeMethods = {
             function(structure) {
                 var type = structure.structureType;
                 return structure.energy < structure.energyCapacity && 
-                       (type == STRUCTURE_EXTENSION || type == STRUCTURE_SPAWN);
+                       (type == STRUCTURE_EXTENSION || type == STRUCTURE_SPAWN || type == STRUCTURE_TOWER || type == STRUCTURE_CONTAINER);
             };
-        var chargeables = creep.room.find(FIND_MY_STRUCTURES, {filter : chargeablesFilter});
-        if (chargeables[0]) {
-            if (creep.transfer(chargeables[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(chargeables[0]);
+        var chargeable = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {filter : chargeablesFilter});
+        if (chargeable) {
+            if (creep.transfer(chargeable, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(chargeable);
             }
             return true;
         }
@@ -29,19 +30,45 @@ var chargeMethods = {
     },
     
     repair : function(creep) {
-        var repairableFilter = (s) => (s.hits < s.hitsMax);
-        var repairables = Game.spawns.Spawn1.room.find(FIND_MY_STRUCTURES, {filter : repairableFilter});
-        if (!repairables[0]) {
+        var repairableFilter = (s) => (s.hits < s.hitsMax && s.structureType != STRUCTURE_RAMPART);
+        var repairable = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {filter : repairableFilter});
+        if (!repairable) {
             return false;
-        }
-        if (creep.repair(repairables[0]) == ERR_NOT_IN_RANGE) {
-            creep.moveByPath(repairables[0]);
+        } else if (creep.repair(repairable) == ERR_NOT_IN_RANGE) {
+            creep.moveTo(repairable);
         }
         return true;
     },
     
+    repairWallsRamparts : function(creep, health) {
+        var wallFilter = (s) => ((s.structureType == STRUCTURE_WALL || 
+                                s.structureType == STRUCTURE_RAMPART ||
+                                s.structureType == STRUCTURE_ROAD) && 
+                                s.hits < health && s.hits < s.hitsMax);
+        var nearestWall = creep.pos.findClosestByPath(FIND_STRUCTURES, {filter : wallFilter});
+        if (!nearestWall) {
+            return false;
+        } else { 
+            if (creep.repair(nearestWall) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(nearestWall);
+            }
+            return true;
+        }
+    },
+    
+    repairByType : function() {
+        var creep = arguments[0];
+        var sType = arguments[1];
+        var maxHealth = 1000000000000;
+        if (arguments.length > 2) {
+            maxHealth = arguments[2];
+        }
+        var filter = (s) => (s.structureType == type && s.hits < s.hitsMax && s.hits < maxHealth);
+        var nearest = creep.findClosestByPath(FIND_STRUCTURES, {filter : filter})
+    },
+    
     upgradeController : function(creep) {
-        var controller = creep.room.controller;
+        var controller = Game.spawns.Spawn1.room.controller;
         if (controller) {
             if (creep.upgradeController(controller) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(controller);
