@@ -8,18 +8,18 @@
  */
  
  
-var chargeMethods = {
+let chargeMethods = {
     
     // directs parameter "creep" to charge the first "chargeDestinations" element that isn't already full
     // returns true if the creep successfully harvests or moves toward a resource that is not fully charged
     stdCharge : function(creep) {
-        var chargeablesFilter = 
+        let chargeablesFilter = 
             function(structure) {
-                var type = structure.structureType;
+                let type = structure.structureType;
                 return structure.energy < structure.energyCapacity && 
                        (type == STRUCTURE_EXTENSION || type == STRUCTURE_SPAWN || type == STRUCTURE_TOWER || type == STRUCTURE_CONTAINER);
             };
-        var chargeable = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {filter : chargeablesFilter});
+        let chargeable = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {filter : chargeablesFilter});
         if (chargeable) {
             if (creep.transfer(chargeable, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(chargeable);
@@ -30,8 +30,8 @@ var chargeMethods = {
     },
     
     repair : function(creep) {
-        var repairableFilter = (s) => (s.hits < s.hitsMax && s.structureType != STRUCTURE_RAMPART);
-        var repairable = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {filter : repairableFilter});
+        let repairableFilter = (s) => (s.hits < s.hitsMax && s.structureType != STRUCTURE_RAMPART);
+        let repairable = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {filter : repairableFilter});
         if (!repairable) {
             return false;
         } else if (creep.repair(repairable) == ERR_NOT_IN_RANGE) {
@@ -41,11 +41,11 @@ var chargeMethods = {
     },
     
     repairWallsRamparts : function(creep, health) {
-        var wallFilter = (s) => ((s.structureType == STRUCTURE_WALL || 
+        let wallFilter = (s) => ((s.structureType == STRUCTURE_WALL || 
                                 s.structureType == STRUCTURE_RAMPART ||
                                 s.structureType == STRUCTURE_ROAD) && 
                                 s.hits < health && s.hits < s.hitsMax);
-        var nearestWall = creep.pos.findClosestByPath(FIND_STRUCTURES, {filter : wallFilter});
+        let nearestWall = creep.pos.findClosestByPath(FIND_STRUCTURES, {filter : wallFilter});
         if (!nearestWall) {
             return false;
         } else { 
@@ -57,8 +57,8 @@ var chargeMethods = {
     },
     
     repairByType : function() {
-        var creep = arguments[0];
-        var sType = arguments[1];
+        let creep = arguments[0];
+        let sType = arguments[1];
         var maxHealth = 1000000000000;
         if (arguments.length > 2) {
             maxHealth = arguments[2];
@@ -68,7 +68,7 @@ var chargeMethods = {
     },
     
     upgradeController : function(creep) {
-        var controller = Game.spawns.Spawn1.room.controller;
+        var controller = creep.room.controller;
         if (controller) {
             if (creep.upgradeController(controller) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(controller);

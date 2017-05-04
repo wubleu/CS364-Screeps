@@ -2,31 +2,44 @@ var chargeMethods = require("methods.charge");
 
 var roleBuilder = {
 
-    create: function(spawn) {
-        spawn.createCreep(
-            [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, 
-             CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], 
-            {role : 'builder', node : 'c12d077296e6ac9', building : false});
+    create: function(spawn, config) {
+        var migrating = 0;
+        if (arguments.length > 2) {
+            migrating = arguments[2];
+        }
+        spawn.createCreep(config, {role : 'builder', building : false, migrating : migrating});
     },
 
     /** @param {Creep} creep **/
     run: function(creep) {
-        if (Memory.repairCounter > 40000) {
-             if (chargeMethods.repairWallsRamparts(creep, 15000)) {
-                 return;
-             } else {
-                 Memory.repairCounter = 0;
-             }
+        if (creep.memory.migrating == 2) {
+            var p = new RoomPosition(25, 45, 'W7N4');
+            creep.moveTo(p);
+            if (creep.pos.isEqualTo(p)) { creep.memory.migrating = 0; }
+            else { return; }
         }
+        
         //switch to not building if no energy to build with
         if(creep.memory.building && creep.carry.energy == 0) {
             creep.memory.building = false;
-            creep.say('harvest');
+            creep.say('harvest'); 
+            var node = creep.pos.findClosestByPath(FIND_SOURCES, {filter : (s) => (s.energy > 0 && s.room.id == creep.room.id)});
+            if (node) {
+                creep.memory.node = node.id;
+            }
         }
         //switch to building if full on energy
         else if(!creep.memory.building && creep.carry.energy == creep.carryCapacity) {
             creep.memory.building = true;
             creep.say('build');
+        }
+        
+        if (creep.memory.building && Memory.repairCounter > Memory.repairInterval) {
+             if (chargeMethods.repairWallsRamparts(creep, 50000)) {
+                 return;
+             } else {
+                 Memory.repairCounter = 0;
+             }
         }
 
         //building structures
@@ -52,10 +65,21 @@ var roleBuilder = {
                 if (creep.withdraw(Container, RESOURCE_ENERGY)==ERR_NOT_IN_RANGE){
                     creep.moveTo(Container);   
                 }
-            }else{
+            } else {
                 if (creep.memory.node) {
+                    if (Game.getObjectById(creep.memory.node).energy == 0) {
+                        var node = creep.pos.findClosestByPath(FIND_SOURCES, {filter : (s) => (s.energy > 0)});
+                        if (node) {
+                            creep.memory.node = node.id;
+                        }
+                    }
                     if (creep.harvest(Game.getObjectById(creep.memory.node)) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(Game.getObjectById(creep.memory.node));
+                        if (creep.moveTo(Game.getObjectById(creep.memory.node)) == ERR_NO_PATH) {
+                            var node = creep.pos.findClosestByPath(FIND_SOURCES, {filter : (s) => (s.energy > 0)});
+                            if (node) {
+                                creep.memory.node = node.id;
+                            }
+                        }
                     }
                     return true;
                 }
