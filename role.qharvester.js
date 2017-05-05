@@ -52,7 +52,6 @@ var roleQHarvester = {
                 creep.memory.deposited += creep.carryCapacity;
             } else if (!chargeMethods.stdCharge(creep)) {
                 chargeMethods.upgradeController(creep);
-                creep.memory.deposited += creep.carryCapacity;
             }
         }
         

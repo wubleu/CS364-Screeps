@@ -3,8 +3,7 @@ var roleBuilder = require('role.builder');
 var QTable = require('QTable');
 var roleQHarvester = require('role.qharvester');
 
-Memory.QTab.currentState = "2w2c2m";
-QTable.initialize()
+QTable.initialize();
 
 module.exports.loop = function() {
     
