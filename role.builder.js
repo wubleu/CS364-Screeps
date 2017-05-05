@@ -8,8 +8,9 @@ var roleBuilder = {
             if (mig > 1) {
                 Memory.migrating++;
             }
-            spawn.createCreep(config, {role : 'builder', building : false, migrating : migrating});
+            return (spawn.createCreep(config, {role : 'builder', building : false, migrating : migrating}));
         }
+        return -1;
     },
 
     /** @param {Creep} creep **/

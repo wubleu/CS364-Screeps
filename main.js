@@ -62,7 +62,7 @@ module.exports.loop = function() {
                 numBuildersR1++;
             } else if(creep.memory.role == 'qharvester'){
         		if (creep.ticksToLive <= 5){
-                    QTable.update(creep.memory.stateStr, creep.memory.deposited);
+                    QTable.update(creep.memory.stateStr, creep.memory.deposited/1000);
                     //Self destruct creep 
                     creep.suicide();
         		}else{
@@ -80,7 +80,7 @@ module.exports.loop = function() {
                 numBuildersR2++;
             }  else if(creep.memory.role == 'qharvester'){
         		if (creep.ticksToLive <= 5){
-                            QTable.update(creep.memory.stateStr, creep.memory.deposited);
+                            QTable.update(creep.memory.stateStr, creep.memory.deposited/1000);
                             //Self destruct creep 
                             creep.suicide();
         		}else{
@@ -116,7 +116,7 @@ module.exports.loop = function() {
     }
     if (numBuildersR2 < room2BuilderMin) {
         // roleBuilder.create(Game.spawns.Spawn2, room2BuildConfig);
-        roleBuilder.create(Game.spawns.Spawn1, room1BuildConfig, 2); 
+        if (roleBuilder.create(Game.spawns.Spawn1, room1BuildConfig, 2) == 0) {  Memory.migrating = 1;  }
     }
     if (numQR2 < room2QMin){
         var action = QTable.softmax(Memory.QTab.currentState);

@@ -10,7 +10,7 @@
 var baseCreep = "2w2c2m";
 var parts = 6;
 var startQ = 1;
-var actions = ["wc","wm","cw","cm","mw","mc",0,-1];
+var actions = ["wc","wm","cw","cm","mw","mc",0];
 
 Memory.QTab = {};
 
@@ -66,9 +66,8 @@ var QTable = {
         // return the new state
         if (action == 0){
             return state;
-        } if (action == -1){
-            return baseCreep;
-        }
+        } 
+        
         var w = parseInt(state.charAt(0));
         var c = parseInt(state.charAt(2));
         var m = parseInt(state.charAt(4));
@@ -99,7 +98,11 @@ var QTable = {
             m++;
         }
         var newState = w.toString() + "w" + c.toString() + "c" + m.toString() + "m";
-        return newState;
+        if (Math.random() > .95){
+            return baseCreep;
+        }else{return newState;}
+        
+    
 
         // EX: [WORK, CARRY, MOVE, MOVE, MOVE] Swap -> [WORK, CARRY, MOVE, MOVE, CARRY]
     },
@@ -112,11 +115,9 @@ var QTable = {
         //Take the state and action, return the reward from the qtab.
         if (action == 0){
             return Memory.QTab.harvester[state];
-        } if (action == -1){
-            return Memory.QTab.harvester[baseCreep];
-        }
+        }  
         
-        //console.log(state);
+        console.log(state);
         
         var w = parseInt(state.charAt(0));
         var c = parseInt(state.charAt(2));
@@ -155,7 +156,7 @@ var QTable = {
         // use Softmax equation to choose the next action
         
         var probs = [];
-        var t = .99;
+        var t = .9;
         
         
         //total
