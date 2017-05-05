@@ -10,7 +10,7 @@
 var baseCreep = "2w2c2m";
 var parts = 6;
 var startQ = 1;
-var actions = ["wc","wm","cw","cm","mw","mc",0];
+var actions = ["wc","wm","cw","cm","mw","mc", 0];
 
 Memory.QTab = {};
 
@@ -66,45 +66,44 @@ var QTable = {
         // return the new state
         if (action == 0){
             return state;
-        } 
+        } else{
         
-        var w = parseInt(state.charAt(0));
-        var c = parseInt(state.charAt(2));
-        var m = parseInt(state.charAt(4));
-        var swapOut = action.charAt(0);
-        var swapIn = action.charAt(1);
-        if(swapOut == "w"){
-            if (w==0){ return -1;}
-            w--;
-        }
-        else if(swapOut == "c"){
-            if (c==0){ return -1;}
-            c--;
-        }
-        else if(swapOut == "m"){
-            if (m==0){ return -1;}
-            m--;
-        }
-        if (swapIn =="w"){
-            if (w==6){return -1;}
-            w++;
-        }
-        else if (swapIn =="c"){
-            if (c==6){return -1;}
-            c++;
-        }
-        else if (swapIn =="m"){
-            if (m==6){return -1;}
-            m++;
-        }
-        var newState = w.toString() + "w" + c.toString() + "c" + m.toString() + "m";
-        if (Math.random() > .95){
-            return baseCreep;
-        }else{return newState;}
+            var w = parseInt(state.charAt(0));
+            var c = parseInt(state.charAt(2));
+            var m = parseInt(state.charAt(4));
+            var swapOut = action.charAt(0);
+            var swapIn = action.charAt(1);
+            if(swapOut == "w"){
+                if (w==0){ return -1;}
+                w--;
+            }
+            else if(swapOut == "c"){
+                if (c==0){ return -1;}
+                c--;
+            }
+            else if(swapOut == "m"){
+                if (m==0){ return -1;}
+                m--;
+            }
+            if (swapIn =="w"){
+                if (w==6){return -1;}
+                w++;
+            }
+            else if (swapIn =="c"){
+                if (c==6){return -1;}
+                c++;
+            }
+            else if (swapIn =="m"){
+                if (m==6){return -1;}
+                m++;
+            }
+            var newState = w.toString() + "w" + c.toString() + "c" + m.toString() + "m";
+            if (Math.random() > .95){
+                return baseCreep;
+            }else{return newState;}
         
-    
+        }
 
-        // EX: [WORK, CARRY, MOVE, MOVE, MOVE] Swap -> [WORK, CARRY, MOVE, MOVE, CARRY]
     },
     
     startState : function(){
@@ -115,41 +114,41 @@ var QTable = {
         //Take the state and action, return the reward from the qtab.
         if (action == 0){
             return Memory.QTab.harvester[state];
-        }  
+        } else{
         
-        console.log(state);
+            var w = parseInt(state.charAt(0));
+            var c = parseInt(state.charAt(2));
+            var m = parseInt(state.charAt(4));
+            var swapOut = action.charAt(0);
+            var swapIn = action.charAt(1);
+            if(swapOut == "w"){
+                if (w==0){ return -1;}
+                w--;
+            }
+            else if(swapOut == "c"){
+                if (c==0){ return -1;}
+                c--;
+            }
+            else if(swapOut == "m"){
+                if (m==0){ return -1;}
+                m--;
+            }
+            if (swapIn =="w"){
+                if (w==6){return -1;}
+                w++;
+            }
+            else if (swapIn =="c"){
+                if (c==6){return -1;}
+                c++;
+            }
+            else if (swapIn =="m"){
+                if (m==6){return -1;}
+                m++;
+            }
+            var newState = w.toString() + "w" + c.toString() + "c" + m.toString() + "m";
+            return Memory.QTab.harvester[newState];
         
-        var w = parseInt(state.charAt(0));
-        var c = parseInt(state.charAt(2));
-        var m = parseInt(state.charAt(4));
-        var swapOut = action.charAt(0);
-        var swapIn = action.charAt(1);
-        if(swapOut == "w"){
-            if (w==0){ return -1;}
-            w--;
         }
-        else if(swapOut == "c"){
-            if (c==0){ return -1;}
-            c--;
-        }
-        else if(swapOut == "m"){
-            if (m==0){ return -1;}
-            m--;
-        }
-        if (swapIn =="w"){
-            if (w==6){return -1;}
-            w++;
-        }
-        else if (swapIn =="c"){
-            if (c==6){return -1;}
-            c++;
-        }
-        else if (swapIn =="m"){
-            if (m==6){return -1;}
-            m++;
-        }
-        var newState = w.toString() + "w" + c.toString() + "c" + m.toString() + "m";
-        return Memory.QTab.harvester[newState];
     },
     
     softmax : function(state){
