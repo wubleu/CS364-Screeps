@@ -2,13 +2,14 @@ var chargeMethods = require("methods.charge");
 
 var roleBuilder = {
 
-    create: function(spawn, config) {
-        var migrating = 0;
-        if (arguments.length > 2) {
-            creep.memory.migrating = arguments[2];
-            Memory.migrating++;
+    create: function(spawn, config, mig) {
+        if (spawn.canCreateCreep(config) == 0) {
+            let migrating = mig;
+            if (mig > 1) {
+                Memory.migrating++;
+            }
+            spawn.createCreep(config, {role : 'builder', building : false, migrating : migrating});
         }
-        spawn.createCreep(config, {role : 'builder', building : false, migrating : migrating});
     },
 
     /** @param {Creep} creep **/
@@ -16,9 +17,9 @@ var roleBuilder = {
         if (creep.memory.migrating == 2) {
             var p = new RoomPosition(25, 45, 'W7N4');
             creep.moveTo(p);
-            if (creep.pos.isEqualTo(p)) { 
+            if (creep.pos.x == p.x && creep.pos.y == p.y) { 
+                Memory.migrating = Memory.migrating - 1;
                 creep.memory.migrating = 0;
-                Memory.migrating--; 
                 creep.memory.node = creep.pos.findClosestByPath(FIND_SOURCES, {filter : (s) => (s.energy > 0)}).id;
             }
             else { return; }

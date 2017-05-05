@@ -18,7 +18,7 @@ module.exports.loop = function() {
     
     // used to allow us to repair all decaying structures every repairInterval turns
     Memory.repairCounter++;
-    Memory.repairInterval = 10000;                  // doesnt need to be done every turn
+    Memory.repairInterval = 4000;                  // doesnt need to be done every turn
     
     let room1 = Game.rooms['W7N3']; 
     let room2 = Game.rooms['W7N4'];
@@ -26,17 +26,17 @@ module.exports.loop = function() {
     room1.memory.spawn = Game.spawns.Spawn1.id;        // doesnt need to be done every turn
     room2.memory.spawn = Game.spawns.Spawn2.id;        // doesnt need to be done every turn
     
-    let room1HarvestConfig =  [WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
-    let room1BuildConfig = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, 
-                            CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+    let room1HarvestConfig = [WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+    let room1BuildConfig = [WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE] //[WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, 
+                            //CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
     //      CURRENTLY USING ROOM1 FOR ALL SPAWNS
-    let room2HarvestConfig = [WORK, WORK, CARRY, CARRY, MOVE]; //[WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE];
-    let room2BuildConfig = room2HarvestConfig;
+    // let room2HarvestConfig = [WORK, WORK, CARRY, CARRY, MOVE]; //[WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE];
+    // let room2BuildConfig = room2HarvestConfig;
     
     let room1HarvesterMin = 3;
     let room1BuilderMin = 2;
     let room2HarvesterMin = 3;
-    let room2BuilderMin = 2;
+    let room2BuilderMin = 3;
     
     
     
@@ -69,31 +69,27 @@ module.exports.loop = function() {
     }
     // maintains populations in room 1
     if (numHarvestersR1 < room1HarvesterMin) {
-        roleHarvester.create(Game.spawns.Spawn1, room1HarvestConfig);
+        roleHarvester.create(Game.spawns.Spawn1, room1HarvestConfig, 0);
     }
     if (numBuildersR1 < room1BuilderMin) {
-        roleBuilder.create(Game.spawns.Spawn1, room1BuildConfig);
+        roleBuilder.create(Game.spawns.Spawn1, room1BuildConfig, 0);
     }
     if (numBuildersR1 + numHarvestersR1 == 0) {
-        roleBuilder.create(Game.spawns.Spawn1, [WORK, CARRY, MOVE]  );
+        roleBuilder.create(Game.spawns.Spawn1, [WORK, WORK, CARRY, CARRY, MOVE, MOVE], 0);
     }
     
     // maintains populations in room 2
     if (numHarvestersR2 < room2HarvesterMin) {
         // roleHarvester.create(Game.spawns.Spawn2, room2HarvestConfig);
-        roleHarvester.create(Game.spawns.Spawn1, room1HarvestConfig, 2);
+        roleHarvester.create(Game.spawns.Spawn1, room1HarvestConfig, 2); 
     }
     if (numBuildersR2 < room2BuilderMin) {
         // roleBuilder.create(Game.spawns.Spawn2, room2BuildConfig);
-        roleBuilder.create(Game.spawns.Spawn1, room1BuildConfig, 2);
+        roleBuilder.create(Game.spawns.Spawn1, room1BuildConfig, 2); 
     }
     if (numBuildersR2 + numHarvestersR2 == 0) {
-        roleBuilder.create(Game.spawns.Spawn2, [WORK, CARRY, MOVE]);
+        roleBuilder.create(Game.spawns.Spawn2, [WORK, WORK, CARRY,CARRY, MOVE, MOVE], 0);
     }
-    if (numBuildersR2+numHarvestersR2 == numCreepsR2) {
-        Memory.migrating = 0;
-    }
-    console.log(Memory.migrating);
     
     if (room1.find(FIND_HOSTILE_CREEPS)[0]) {
         structureDefense.towersDefend(room1);
@@ -101,5 +97,6 @@ module.exports.loop = function() {
     if (room2.find(FIND_HOSTILE_CREEPS)[0]) {
         structureDefense.towersDefend(room2);
     }
-    
+    Memory.migrating = 0;
+    console.log(Memory.migrating + "   " + numBuildersR2);
 }
