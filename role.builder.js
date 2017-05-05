@@ -50,6 +50,14 @@ var roleBuilder = {
 
         //building structures
         if(creep.memory.building) {
+            if (Memory.repairingRamparts) {
+                Memory.repairingRamparts = chargeMethods.repairRamparts(creep, 50000);
+                if (Memory.repairingRamparts) {
+                    return;
+                } else {
+                    Memory.repairingRamparts = (creep.room.id == Game.spawns.Spawn2.room.id);
+                }
+            }
             var target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
             if (!chargeMethods.repair(creep)) {
                 if (target) {

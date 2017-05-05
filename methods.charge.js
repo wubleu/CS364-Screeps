@@ -56,15 +56,23 @@ let chargeMethods = {
         }
     },
     
-    repairByType : function() {
-        let creep = arguments[0];
-        let sType = arguments[1];
-        var maxHealth = 1000000000000;
-        if (arguments.length > 2) {
-            maxHealth = arguments[2];
+    repairRamparts : function(creep, health) {
+        let rFilter = (s)=>(s.structureType == STRUCTURE_RAMPART && s.hits < health);
+        let rampart = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {filter : rFilter});
+        let cFilter = (s)=>(s.structureType == STRUCTURE_RAMPART);
+        let constr = creep.pos.findClosestByPath(FIND_MY_CONSTRUCTION_SITES, {filter : cFilter});
+        if (rampart) {
+            if (creep.repair(rampart) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(rampart);
+            }
+            return true;
+        } else if (constr) {
+            if (creep.build(constr) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(constr);
+            }
+            return true;
         }
-        var filter = (s) => (s.structureType == type && s.hits < s.hitsMax && s.hits < maxHealth);
-        var nearest = creep.findClosestByPath(FIND_STRUCTURES, {filter : filter})
+        return false;
     },
     
     upgradeController : function(creep) {

@@ -49,7 +49,7 @@ module.exports.loop = function() {
     var numQR1 = 0;
     var numHarvestersR2 = Memory.migrating;
     var numBuildersR2 = Memory.migrating;
-    var numQR2 = 0;
+    var numQR2 = Memory.migrating;
     var numCreepsR2 = 0;
     for (var name in Game.creeps) {
         var creep = Game.creeps[name];
@@ -62,12 +62,12 @@ module.exports.loop = function() {
                 numBuildersR1++;
             } else if(creep.memory.role == 'qharvester'){
         		if (creep.ticksToLive <= 5){
-                            QTable.update(creep.memory.stateStr, creep.memory.deposited);
-                            //Self destruct creep 
-                            creep.suicide();
+                    QTable.update(creep.memory.stateStr, creep.memory.deposited);
+                    //Self destruct creep 
+                    creep.suicide();
         		}else{
-                            roleQHarvester.run(creep);
-                            numQR1++;
+                    roleQHarvester.run(creep);
+                    numQR1++;
         		}
     	    }
         }
@@ -90,7 +90,6 @@ module.exports.loop = function() {
     	    }
         }
     }
-    console.log(numQR1);
     // maintains populations in room 1
     if (numHarvestersR1 < room1HarvesterMin) {
         roleHarvester.create(Game.spawns.Spawn1, room1HarvestConfig, 0);
@@ -99,10 +98,12 @@ module.exports.loop = function() {
         roleBuilder.create(Game.spawns.Spawn1, room1BuildConfig, 0);
     }
     if (numQR1 < room1QMin){
+        console.log(numQR1);
         var action = QTable.softmax(Memory.QTab.currentState);
         var newState = QTable.generateNewState(Memory.QTab.currentState, action);
         Memory.QTab.currentState = newState;
         roleQHarvester.create(Game.spawns.Spawn1, newState, 0);
+        console.log(newState);
     }
     if (numBuildersR1 + numHarvestersR1 == 0) {
         roleBuilder.create(Game.spawns.Spawn1, [WORK, WORK, CARRY, CARRY, MOVE, MOVE], 0);
@@ -135,5 +136,9 @@ module.exports.loop = function() {
     if (room2.find(FIND_HOSTILE_CREEPS)[0]) {
         structureDefense.towersDefend(room2);
     }
-    console.log(Memory.migrating + "   " + numBuildersR2 + "  " + numHarvestersR2 + "   " + numQR2);
+    
+    let rFilter = (s)=>(s.structureType == STRUCTURE_RAMPART && s.hits < 15000)
+    if (room1.find(FIND_MY_STRUCTURES, {filter : rFilter})) {
+        Memory.repairingRamparts = true;
+    }
 }
