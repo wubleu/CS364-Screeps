@@ -27,8 +27,8 @@ module.exports.loop = function() {
     room2.memory.spawn = Game.spawns.Spawn2.id;        // doesnt need to be done every turn
     
     let room1HarvestConfig = [WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
-    let room1BuildConfig = [WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE] //[WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, 
-                            //CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+    let room1BuildConfig = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, 
+                            CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
     //      CURRENTLY USING ROOM1 FOR ALL SPAWNS
     // let room2HarvestConfig = [WORK, WORK, CARRY, CARRY, MOVE]; //[WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE];
     // let room2BuildConfig = room2HarvestConfig;
@@ -97,6 +97,5 @@ module.exports.loop = function() {
     if (room2.find(FIND_HOSTILE_CREEPS)[0]) {
         structureDefense.towersDefend(room2);
     }
-    Memory.migrating = 0;
-    console.log(Memory.migrating + "   " + numBuildersR2);
+    console.log(Memory.migrating + "   " + numBuildersR2 + "  " + numHarvestersR2);
 }
