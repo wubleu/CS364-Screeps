@@ -138,7 +138,13 @@ module.exports.loop = function() {
     }
     
     let rFilter = (s)=>(s.structureType == STRUCTURE_RAMPART && s.hits < 15000)
-    if (room1.find(FIND_MY_STRUCTURES, {filter : rFilter})) {
+    if (room1.find(FIND_MY_STRUCTURES, {filter : rFilter})[0]) {
         Memory.repairingRamparts = true;
+    }
+    if (Memory.repairingRamparts) {
+        let doneFilter = (s) => (s.structureType == STRUCTURE_RAMPART && s.hits < 48000);
+        if (!room1.find(FIND_STRUCTURES, {filter : doneFilter})[0]) {
+            Memory.repairingRamparts = false;
+        }
     }
 }
