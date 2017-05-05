@@ -1,11 +1,14 @@
 var roleHarvester = require('role.harvester');
 var roleBuilder = require('role.builder');
+<<<<<<< HEAD
 var structureDefense = require('methods.structureDefense');
+=======
 var QTable = require('QTable');
 var roleQHarvester = require('role.qharvester');
 
 Memory.QTab.currentState = "2w2c2m";
 QTable.initialize()
+>>>>>>> 2c2261e6f92e6abda8265e6193d27d5d9c9e10db
 
 module.exports.loop = function() {
     //          USED FOR COMMANDING CREEPS DIRECTLY
@@ -19,6 +22,8 @@ module.exports.loop = function() {
     // }
     // thisCreep.upgradeController(Game.getObjectById('ff7a07728e60965'));
     // thisCreep.claimController(Game.getObjectById('ff7a07728e60965'));
+    
+<<<<<<< HEAD
     
     // used to allow us to repair all decaying structures every repairInterval turns
     Memory.repairCounter++;
@@ -37,19 +42,17 @@ module.exports.loop = function() {
     // let room2HarvestConfig = [WORK, WORK, CARRY, CARRY, MOVE]; //[WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE];
     // let room2BuildConfig = room2HarvestConfig;
     
-    let room1HarvesterMin = 0;
+    let room1HarvesterMin = 3;
     let room1BuilderMin = 2;
-    let room1QMin = 3;
-    let room2HarvesterMin = 0;
+    let room2HarvesterMin = 3;
     let room2BuilderMin = 3;
-    let room2QMin = 3
+    
+    
     
     var numHarvestersR1 = 0;
     var numBuildersR1 = 0;
-    var numQR1 = 0;
     var numHarvestersR2 = Memory.migrating;
     var numBuildersR2 = Memory.migrating;
-    var numQR2 = 0;
     var numCreepsR2 = 0;
     for (var name in Game.creeps) {
         var creep = Game.creeps[name];
@@ -60,16 +63,31 @@ module.exports.loop = function() {
             } else if(creep.memory.role == 'builder'){
                 roleBuilder.run(creep);
                 numBuildersR1++;
-            } else if(creep.memory.role == 'qharvester'){
-        		if (creep.ticksToLive <= 5){
-                            QTable.update(creep.memory.stateStr, creep.memory.deposited);
-                            //Self destruct creep 
-                            creep.suicide();
-        		}else{
-                            roleQHarvester.run(creep);
-                            numQR1++;
-        		}
-    	    }
+            }
+            numCreepsR2++;
+=======
+    var numHarvesters = 0;
+    var numBuilders = 0;
+    var numQ = 0;
+    
+    for (var name in Game.creeps) {
+        var creep = Game.creeps[name];
+        if (creep.memory.role == 'harvester') {
+            roleHarvester.run(creep);
+            numHarvesters++;
+        } else if(creep.memory.role == 'builder'){
+            roleBuilder.run(creep);
+            numBuilders++;
+        } else if(creep.memory.role == 'qharvester'){
+            if (creep.ticksToLive == 5){
+                QTable.update(creep.memory.stateStr, creep.memory.deposited);
+                //Self destruct creep 
+                creep.suicide();
+            }else{
+                roleQHarvester.run(creep);
+                numQ++;
+            }
+>>>>>>> 2c2261e6f92e6abda8265e6193d27d5d9c9e10db
         }
         if (creep.room == room2) {
             if (creep.memory.role == 'harvester') {
@@ -78,19 +96,9 @@ module.exports.loop = function() {
             } else if(creep.memory.role == 'builder'){
                 roleBuilder.run(creep);
                 numBuildersR2++;
-            }  else if(creep.memory.role == 'qharvester'){
-        		if (creep.ticksToLive <= 5){
-                            QTable.update(creep.memory.stateStr, creep.memory.deposited);
-                            //Self destruct creep 
-                            creep.suicide();
-        		}else{
-                            roleQHarvester.run(creep);
-                            numQR2++;
-        		}
-    	    }
+            }
         }
     }
-    console.log(numQR1);
     // maintains populations in room 1
     if (numHarvestersR1 < room1HarvesterMin) {
         roleHarvester.create(Game.spawns.Spawn1, room1HarvestConfig, 0);
@@ -98,16 +106,11 @@ module.exports.loop = function() {
     if (numBuildersR1 < room1BuilderMin) {
         roleBuilder.create(Game.spawns.Spawn1, room1BuildConfig, 0);
     }
-    if (numQR1 < room1QMin){
-        var action = QTable.softmax(Memory.QTab.currentState);
-        var newState = QTable.generateNewState(Memory.QTab.currentState, action);
-        Memory.QTab.currentState = newState;
-        roleQHarvester.create(Game.spawns.Spawn1, newState, 0);
-    }
     if (numBuildersR1 + numHarvestersR1 == 0) {
         roleBuilder.create(Game.spawns.Spawn1, [WORK, WORK, CARRY, CARRY, MOVE, MOVE], 0);
     }
-
+<<<<<<< HEAD
+    
     // maintains populations in room 2
     if (numHarvestersR2 < room2HarvesterMin) {
         // roleHarvester.create(Game.spawns.Spawn2, room2HarvestConfig);
@@ -116,24 +119,29 @@ module.exports.loop = function() {
     if (numBuildersR2 < room2BuilderMin) {
         // roleBuilder.create(Game.spawns.Spawn2, room2BuildConfig);
         roleBuilder.create(Game.spawns.Spawn1, room1BuildConfig, 2); 
-    }
-    if (numQR2 < room2QMin){
+=======
+    if (numQ < 3){
         var action = QTable.softmax(Memory.QTab.currentState);
         var newState = QTable.generateNewState(Memory.QTab.currentState, action);
         Memory.QTab.currentState = newState;
-        roleQHarvester.create(Game.spawns.Spawn1, newState, 2);
+        roleQHarvester.create(Game.spawns.Spawn1, newState);
     }
-
+    if (numHarvesters < 6) {
+        roleHarvester.create(Game.spawns.Spawn1);
+>>>>>>> 2c2261e6f92e6abda8265e6193d27d5d9c9e10db
+    }
     if (numBuildersR2 + numHarvestersR2 == 0) {
         roleBuilder.create(Game.spawns.Spawn2, [WORK, WORK, CARRY,CARRY, MOVE, MOVE], 0);
     }
 
-        
+    
+    
+    
     if (room1.find(FIND_HOSTILE_CREEPS)[0]) {
         structureDefense.towersDefend(room1);
     }
     if (room2.find(FIND_HOSTILE_CREEPS)[0]) {
         structureDefense.towersDefend(room2);
     }
-    console.log(Memory.migrating + "   " + numBuildersR2 + "  " + numHarvestersR2 + "   " + numQR2);
+    console.log(Memory.migrating + "   " + numBuildersR2 + "  " + numHarvestersR2);
 }
