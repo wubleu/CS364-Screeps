@@ -7,8 +7,8 @@
  * mod.thing == 'a thing'; // true
  */
  
-var baseCreep = "2w2c2m";
-var parts = 6;
+var baseCreep = "3w3c3m";
+var parts = 9;
 var startQ = 1;
 var actions = ["wc","wm","cw","cm","mw","mc", 0];
 let learnRate = .8;
@@ -32,7 +32,7 @@ var QTable = {
         }
     },
     
-    update : function(state, collected){
+    update : function(state, reward, prevQ){
         // Updates the reward after the life of the creep. 
         //Takes creep data from 5 ticks left suicide() call, and updates that entry of the table.
         var totalCost = 0;
@@ -52,13 +52,14 @@ var QTable = {
             totalCost += 50;
         }
         
-        
-        let rhs = learnRate * (collected - totalCost);
-        let prevQ = Memory.QTab.harvester[state];
-        let lhs = (1-learnRate) * prevQ;
+        reward /= 300.0;
+        totalCost /= 300.0;
+        let rhs = learnRate * (reward - totalCost);
+        let currQ = Memory.QTab.harvester[state];
+        let lhs = (1-learnRate) * currQ;
         
         Memory.QTab.harvester[state] = rhs + lhs;
-        console.log(state + ":\t" + prevQ + " --> " + Memory.QTab.harvester[state]);
+        console.log(state + ":    " + prevQ.toFixed(4) + " --> " + currQ.toFixed(4) + " --> " + Memory.QTab.harvester[state].toFixed(4));
         
         return true;
 
@@ -89,15 +90,15 @@ var QTable = {
                 m--;
             }
             if (swapIn =="w"){
-                if (w==6){return baseCreep;}
+                if (w==0){return baseCreep;}
                 w++;
             }
             else if (swapIn =="c"){
-                if (c==6){return baseCreep;}
+                if (c==0){return baseCreep;}
                 c++;
             }
             else if (swapIn =="m"){
-                if (m==6){return baseCreep;}
+                if (m==0){return baseCreep;}
                 m++;
             }
             var newState = w.toString() + "w" + c.toString() + "c" + m.toString() + "m";

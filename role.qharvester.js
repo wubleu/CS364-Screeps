@@ -29,12 +29,15 @@ var roleQHarvester = {
         for (i=0;i<m;i++){
             body.push(MOVE);
         }
+        
         if (spawn.canCreateCreep(body) == 0) {
             let migrating = mig;
             if (mig > 1) {
                 Memory.migrating++;
             }
-            spawn.createCreep(body, {role : 'qharvester', new : true, node : srcs[0].id, stateStr : state, deposited : 0, migrating : migrating});
+            console.log("spawning " + body);
+            spawn.createCreep(body, {role : 'qharvester', new : true, node : srcs[0].id, stateStr : state, deposited : 0, 
+                                    migrating : migrating, prevQ : Memory.QTab.harvester[state]});
         }
         
         
@@ -55,7 +58,12 @@ var roleQHarvester = {
         if (!creep.memory.depositing) {
             if (creep.carry.energy < creep.carryCapacity) {
                 if (creep.harvest(Game.getObjectById(creep.memory.node)) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(Game.getObjectById(creep.memory.node));
+                    if (creep.moveTo(Game.getObjectById(creep.memory.node)) == ERR_NO_PATH) {
+                        var node = creep.pos.findClosestByPath(FIND_SOURCES, {filter : (s) => (s.energy > 0)});
+                        if (node) {
+                            creep.memory.node = node.id;
+                        }
+                    }
                 } 
             }
             else {

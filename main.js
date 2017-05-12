@@ -4,9 +4,10 @@ var structureDefense = require('methods.structureDefense');
 var QTable = require('QTable');
 var roleQHarvester = require('role.qharvester');
 
-Memory.QTab.currentState = "2w2c2m";
+// Memory.QTab.currentState = "3w3c3m";
 // Memory.QTab = {};
 // QTable.initialize();
+// Memory.QTab.currentState = "3w3c3m";
 
 module.exports.loop = function() {
     //          USED FOR COMMANDING CREEPS DIRECTLY
@@ -62,7 +63,7 @@ module.exports.loop = function() {
                 numBuildersR1++;
             } else if(creep.memory.role == 'qharvester'){
         		if (creep.ticksToLive <= 5){
-                    QTable.update(creep.memory.stateStr, creep.memory.deposited/3);
+                    QTable.update(creep.memory.stateStr, creep.memory.deposited/3, creep.memory.prevQ);
                     //Self destruct creep 
                     creep.suicide();
         		}else{
@@ -80,7 +81,7 @@ module.exports.loop = function() {
         //         numBuildersR2++;
         //     }  else if(creep.memory.role == 'qharvester'){
         // 		if (creep.ticksToLive <= 5){
-        //                     QTable.update(creep.memory.stateStr, creep.memory.deposited/100);
+        //                     QTable.update(creep.memory.stateStr, creep.memory.deposited/100, creep.memory.prevQ);
         //                     //Self destruct creep 
         //                     creep.suicide();
         // 		}else{

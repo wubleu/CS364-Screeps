@@ -29,7 +29,7 @@ var roleBuilder = {
         //switch to not building if no energy to build with
         if(creep.memory.building && creep.carry.energy == 0) {
             creep.memory.building = false;
-            creep.say('harvest'); 
+            creep.say('harvest');  
             var node = creep.pos.findClosestByPath(FIND_SOURCES, {filter : (s) => (s.energy > 0)});
             if (node) {
                 creep.memory.node = node.id;
@@ -38,7 +38,8 @@ var roleBuilder = {
         //switch to building if full on energy
         else if(!creep.memory.building && creep.carry.energy == creep.carryCapacity) {
             creep.memory.building = true;
-            creep.say('build');
+            if (Memory.repairCounter > Memory.repairInterval) {  creep.say('repair W+R')  }
+            else {  creep.say('build');  }
         }
         
         if (creep.memory.building && Memory.repairCounter > Memory.repairInterval) {
