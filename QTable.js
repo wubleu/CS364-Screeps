@@ -11,8 +11,8 @@ var baseCreep = "2w2c2m";
 var parts = 6;
 var startQ = 1;
 var actions = ["wc","wm","cw","cm","mw","mc", 0];
-
-Memory.QTab = {};
+let learnRate = .8;
+let discount = .9;
 
 var QTable = {
     
@@ -53,9 +53,12 @@ var QTable = {
         }
         
         
-        var value = collected - totalCost;
+        let rhs = learnRate * (collected - totalCost);
+        let prevQ = Memory.QTab.harvester[state];
+        let lhs = (1-learnRate) * prevQ;
         
-        Memory.QTab.harvester[state] = value;
+        Memory.QTab.harvester[state] = rhs + lhs;
+        console.log(state + ":\t" + prevQ + " --> " + Memory.QTab.harvester[state]);
         
         return true;
 
@@ -74,27 +77,27 @@ var QTable = {
             var swapOut = action.charAt(0);
             var swapIn = action.charAt(1);
             if(swapOut == "w"){
-                if (w==0){ return -1;}
+                if (w==0){ return baseCreep;}
                 w--;
             }
             else if(swapOut == "c"){
-                if (c==0){ return -1;}
+                if (c==0){ return baseCreep;}
                 c--;
             }
             else if(swapOut == "m"){
-                if (m==0){ return -1;}
+                if (m==0){ return baseCreep;}
                 m--;
             }
             if (swapIn =="w"){
-                if (w==6){return -1;}
+                if (w==6){return baseCreep;}
                 w++;
             }
             else if (swapIn =="c"){
-                if (c==6){return -1;}
+                if (c==6){return baseCreep;}
                 c++;
             }
             else if (swapIn =="m"){
-                if (m==6){return -1;}
+                if (m==6){return baseCreep;}
                 m++;
             }
             var newState = w.toString() + "w" + c.toString() + "c" + m.toString() + "m";
@@ -122,27 +125,27 @@ var QTable = {
             var swapOut = action.charAt(0);
             var swapIn = action.charAt(1);
             if(swapOut == "w"){
-                if (w==0){ return -1;}
+                if (w==0){ return 0;}
                 w--;
             }
             else if(swapOut == "c"){
-                if (c==0){ return -1;}
+                if (c==0){ return 0;}
                 c--;
             }
             else if(swapOut == "m"){
-                if (m==0){ return -1;}
+                if (m==0){ return 0;}
                 m--;
             }
             if (swapIn =="w"){
-                if (w==6){return -1;}
+                if (w==6){return 0;}
                 w++;
             }
             else if (swapIn =="c"){
-                if (c==6){return -1;}
+                if (c==6){return 0;}
                 c++;
             }
             else if (swapIn =="m"){
-                if (m==6){return -1;}
+                if (m==6){return 0;}
                 m++;
             }
             var newState = w.toString() + "w" + c.toString() + "c" + m.toString() + "m";
@@ -162,15 +165,14 @@ var QTable = {
         var i;
         var rewardSum = 0;
         for (i=0; i<actions.length;i++){
-            rewardSum = rewardSum + QTable.getReward(state, actions[i]);
+            rewardSum = rewardSum + Math.exp(QTable.getReward(state, actions[i])/t);
         }
-        var total = Math.exp(rewardSum/t);
         
         //individuals 
         var k;
         for (k=0; k<actions.length;k++){
-            var ind = Math.exp(QTable.getReward(state, actions[k]));
-            var prob = ind/total;
+            var ind = Math.exp(QTable.getReward(state, actions[k])/t);
+            var prob = ind/rewardSum;
             probs.push(prob);
         }  
         
@@ -184,9 +186,8 @@ var QTable = {
                 return actions[p];
             }
         }
-        
-        //retun false on error, shouldn't ever get here.
-        return false;
+ 
+        return 0;
 
     }
     

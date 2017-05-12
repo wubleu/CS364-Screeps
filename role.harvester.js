@@ -15,7 +15,6 @@ var roleHarvester = {
     run : function(creep) {
         if (creep.memory.migrating == 2) {
             var p = new RoomPosition(25, 45, 'W7N4');
-            console.log(creep.moveTo(p));
             if (creep.pos.x == p.x && creep.pos.y == p.y) { 
                 Memory.migrating = Memory.migrating - 1;
                 creep.memory.migrating = 0; 

@@ -5,12 +5,13 @@ var QTable = require('QTable');
 var roleQHarvester = require('role.qharvester');
 
 Memory.QTab.currentState = "2w2c2m";
-QTable.initialize()
+// Memory.QTab = {};
+// QTable.initialize();
 
 module.exports.loop = function() {
     //          USED FOR COMMANDING CREEPS DIRECTLY
-    // var position = new RoomPosition(40, 45, 'W7N4');
-    // var thisCreep = Game.creeps.claimer2;
+    // var position = new RoomPosition(40, 12, 'W7N4');
+    // var thisCreep = Game.creeps.claimer;
     // thisCreep.moveTo(position);
     // if (thisCreep.carry < thisCreep.carryCapacity) {
     //     thisCreep.harvest(Game.getObjectById('80d207728e6597b'));
@@ -30,19 +31,18 @@ module.exports.loop = function() {
     room1.memory.spawn = Game.spawns.Spawn1.id;        // doesnt need to be done every turn
     room2.memory.spawn = Game.spawns.Spawn2.id;        // doesnt need to be done every turn
     
-    let room1HarvestConfig = [WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
-    let room1BuildConfig = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, 
-                            CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+    let room1HarvestConfig = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE];
+    let room1BuildConfig = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE];
     //      CURRENTLY USING ROOM1 FOR ALL SPAWNS
     // let room2HarvestConfig = [WORK, WORK, CARRY, CARRY, MOVE]; //[WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE];
     // let room2BuildConfig = room2HarvestConfig;
     
     let room1HarvesterMin = 0;
-    let room1BuilderMin = 2;
-    let room1QMin = 3;
+    let room1BuilderMin =   2;
+    let room1QMin =         4;
     let room2HarvesterMin = 0;
-    let room2BuilderMin = 3;
-    let room2QMin = 3
+    let room2BuilderMin =   3;
+    let room2QMin =         3;
     
     var numHarvestersR1 = 0;
     var numBuildersR1 = 0;
@@ -62,7 +62,7 @@ module.exports.loop = function() {
                 numBuildersR1++;
             } else if(creep.memory.role == 'qharvester'){
         		if (creep.ticksToLive <= 5){
-                    QTable.update(creep.memory.stateStr, creep.memory.deposited/1000);
+                    QTable.update(creep.memory.stateStr, creep.memory.deposited/3);
                     //Self destruct creep 
                     creep.suicide();
         		}else{
@@ -71,25 +71,38 @@ module.exports.loop = function() {
         		}
     	    }
         }
-        if (creep.room == room2) {
-            if (creep.memory.role == 'harvester') {
-                roleHarvester.run(creep);
-                numHarvestersR2++;
-            } else if(creep.memory.role == 'builder'){
-                roleBuilder.run(creep);
-                numBuildersR2++;
-            }  else if(creep.memory.role == 'qharvester'){
-        		if (creep.ticksToLive <= 5){
-                            QTable.update(creep.memory.stateStr, creep.memory.deposited/1000);
-                            //Self destruct creep 
-                            creep.suicide();
-        		}else{
-                            roleQHarvester.run(creep);
-                            numQR2++;
-        		}
-    	    }
-        }
+        // if (creep.room == room2) {
+        //     if (creep.memory.role == 'harvester') {
+        //         roleHarvester.run(creep);
+        //         numHarvestersR2++;
+        //     } else if(creep.memory.role == 'builder'){
+        //         roleBuilder.run(creep);
+        //         numBuildersR2++;
+        //     }  else if(creep.memory.role == 'qharvester'){
+        // 		if (creep.ticksToLive <= 5){
+        //                     QTable.update(creep.memory.stateStr, creep.memory.deposited/100);
+        //                     //Self destruct creep 
+        //                     creep.suicide();
+        // 		}else{
+        //                     roleQHarvester.run(creep);
+        //                     numQR2++;
+        // 		}
+    	   // }
+        // }
     }
+
+    // // maintains populations in room 2
+    // if (numHarvestersR2 < room2HarvesterMin) {
+    //     // roleHarvester.create(Game.spawns.Spawn2, room2HarvestConfig);
+    //     roleHarvester.create(Game.spawns.Spawn1, room1HarvestConfig, 2); 
+    // }
+    // if (numBuildersR2 < room2BuilderMin) {
+    //     // roleBuilder.create(Game.spawns.Spawn2, room2BuildConfig);
+    //     if (roleBuilder.create(Game.spawns.Spawn1, room1BuildConfig, 2) == 0) {  Memory.migrating = 1;  }
+    // }
+    // if (numBuildersR2 + numHarvestersR2 == 0) {
+    //     roleBuilder.create(Game.spawns.Spawn1, [WORK, CARRY, MOVE], 2);
+    // }
     // maintains populations in room 1
     if (numHarvestersR1 < room1HarvesterMin) {
         roleHarvester.create(Game.spawns.Spawn1, room1HarvestConfig, 0);
@@ -97,48 +110,74 @@ module.exports.loop = function() {
     if (numBuildersR1 < room1BuilderMin) {
         roleBuilder.create(Game.spawns.Spawn1, room1BuildConfig, 0);
     }
-    if (numQR1 < room1QMin){
-        console.log(numQR1);
-        var action = QTable.softmax(Memory.QTab.currentState);
-        var newState = QTable.generateNewState(Memory.QTab.currentState, action);
-        Memory.QTab.currentState = newState;
-        roleQHarvester.create(Game.spawns.Spawn1, newState, 0);
-        console.log(newState);
-    }
     if (numBuildersR1 + numHarvestersR1 == 0) {
-        roleBuilder.create(Game.spawns.Spawn1, [WORK, WORK, CARRY, CARRY, MOVE, MOVE], 0);
+        roleBuilder.create(Game.spawns.Spawn1, [WORK, CARRY, MOVE], 0);
     }
-
-    // maintains populations in room 2
-    if (numHarvestersR2 < room2HarvesterMin) {
-        // roleHarvester.create(Game.spawns.Spawn2, room2HarvestConfig);
-        roleHarvester.create(Game.spawns.Spawn1, room1HarvestConfig, 2); 
-    }
-    if (numBuildersR2 < room2BuilderMin) {
-        // roleBuilder.create(Game.spawns.Spawn2, room2BuildConfig);
-        if (roleBuilder.create(Game.spawns.Spawn1, room1BuildConfig, 2) == 0) {  Memory.migrating = 1;  }
-    }
-    if (numQR2 < room2QMin){
+    // if (numQR2 < room2QMin){
+    //     var action = QTable.softmax(Memory.QTab.currentState);
+    //     var newState = QTable.generateNewState(Memory.QTab.currentState, action);
+        
+    //     //parse body and check if possible, otherwise dont change the state
+    //     var w = parseInt(newState.charAt(0));
+    //     var c = parseInt(newState.charAt(2));
+    //     var m = parseInt(newState.charAt(4));
+    //     var body = [];
+        
+    //     var i;
+    //     for (i=0;i<w;i++){
+    //         body.push(WORK);
+    //     }
+    //     for (i=0;i<c;i++){
+    //         body.push(CARRY);
+    //     }
+    //     for (i=0;i<m;i++){
+    //         body.push(MOVE);
+    //     }
+        
+    //     if(Game.spawns.Spawn1.canCreateCreep(body) == 0){
+    //         Memory.QTab.currentState = newState;
+    //         roleQHarvester.create(Game.spawns.Spawn1, newState, 2);
+    //      }
+    // }
+    if (numQR1 < room1QMin){
         var action = QTable.softmax(Memory.QTab.currentState);
         var newState = QTable.generateNewState(Memory.QTab.currentState, action);
-        Memory.QTab.currentState = newState;
-        roleQHarvester.create(Game.spawns.Spawn1, newState, 2);
-    }
-
-    if (numBuildersR2 + numHarvestersR2 == 0) {
-        roleBuilder.create(Game.spawns.Spawn2, [WORK, WORK, CARRY,CARRY, MOVE, MOVE], 0);
+        
+        //parse body and check if possible, otherwise dont change the state
+        var w = parseInt(newState.charAt(0));
+        var c = parseInt(newState.charAt(2));
+        var m = parseInt(newState.charAt(4));
+        var body = [];
+        
+        
+        var i;
+        for (i=0;i<w;i++){
+            body.push(WORK);
+        }
+        for (i=0;i<c;i++){
+            body.push(CARRY);
+        }
+        for (i=0;i<m;i++){
+            body.push(MOVE);
+        }
+        
+        if(Game.spawns.Spawn1.canCreateCreep(body) == 0){
+            Memory.QTab.currentState = newState;
+            roleQHarvester.create(Game.spawns.Spawn1, newState, 0);
+        }
     }
 
         
     if (room1.find(FIND_HOSTILE_CREEPS)[0]) {
         structureDefense.towersDefend(room1);
     }
-    if (room2.find(FIND_HOSTILE_CREEPS)[0]) {
-        structureDefense.towersDefend(room2);
-    }
+    // if (room2.find(FIND_HOSTILE_CREEPS)[0]) {
+    //     structureDefense.towersDefend(room2);
+    // }
     
-    let rFilter = (s)=>(s.structureType == STRUCTURE_RAMPART && s.hits < 15000)
+    let rFilter = (s)=>(s.structureType == STRUCTURE_RAMPART && s.hits < 25000)
     if (room1.find(FIND_MY_STRUCTURES, {filter : rFilter})[0]) {
+        Memory.repairingRamparts || console.log("Repairing ramparts");
         Memory.repairingRamparts = true;
     }
     if (Memory.repairingRamparts) {
