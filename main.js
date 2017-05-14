@@ -4,10 +4,9 @@ var structureDefense = require('methods.structureDefense');
 var QTable = require('QTable');
 var roleQHarvester = require('role.qharvester');
 
-// Memory.QTab.currentState = "3w3c3m";
 // Memory.QTab = {};
 // QTable.initialize();
-// Memory.QTab.currentState = "3w3c3m";
+// Memory.QTab.currentState = "3w3c3m";    // TO EFFECTIVELY CHANGE THIS YOU MUST ALSO CHANGE TOP OF QTABLE
 
 module.exports.loop = function() {
     //          USED FOR COMMANDING CREEPS DIRECTLY

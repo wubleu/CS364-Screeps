@@ -35,7 +35,6 @@ var roleQHarvester = {
             if (mig > 1) {
                 Memory.migrating++;
             }
-            console.log("spawning " + body);
             spawn.createCreep(body, {role : 'qharvester', new : true, node : srcs[0].id, stateStr : state, deposited : 0, 
                                     migrating : migrating, prevQ : Memory.QTab.harvester[state]});
         }

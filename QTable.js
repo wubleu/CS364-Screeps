@@ -12,6 +12,8 @@ var parts = 9;
 var startQ = 1;
 var actions = ["wc","wm","cw","cm","mw","mc", 0];
 let learnRate = .8;
+let learnDecay = .95;
+let learnFloor = .4;
 let discount = .9;
 
 var QTable = {
@@ -33,6 +35,8 @@ var QTable = {
     },
     
     update : function(state, reward, prevQ){
+        if (Memory.learnRate < 0 || Memory.learnRate > 1) {  Memory.learnRate = learnRate;  }
+        if ((Memory.learnRate *= learnDecay) < learnFloor) {  Memory.learnRate == learnFloor; }
         // Updates the reward after the life of the creep. 
         //Takes creep data from 5 ticks left suicide() call, and updates that entry of the table.
         var totalCost = 0;
